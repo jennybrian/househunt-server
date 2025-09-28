@@ -14,15 +14,40 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
+// Existing endpoint for deleting images
 app.post('/delete-image', async (req, res) => {
   const { publicId } = req.body;
-  console.log('Received delete request for publicId:', publicId); // Add this line
+  console.log('Received delete request for image publicId:', publicId);
+  
   if (!publicId) return res.status(400).json({ error: 'publicId required' });
-
+  
   try {
-    const result = await cloudinary.uploader.destroy(publicId);
+    const result = await cloudinary.uploader.destroy(publicId, {
+      resource_type: 'image'  // Explicitly specify image
+    });
+    console.log('Image deletion result:', result);
     res.json(result);
   } catch (err) {
+    console.error('Error deleting image:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// NEW endpoint for deleting videos
+app.post('/delete-video', async (req, res) => {
+  const { publicId } = req.body;
+  console.log('Received delete request for video publicId:', publicId);
+  
+  if (!publicId) return res.status(400).json({ error: 'publicId required' });
+  
+  try {
+    const result = await cloudinary.uploader.destroy(publicId, {
+      resource_type: 'video'  // Specify video resource type
+    });
+    console.log('Video deletion result:', result);
+    res.json(result);
+  } catch (err) {
+    console.error('Error deleting video:', err);
     res.status(500).json({ error: err.message });
   }
 });
